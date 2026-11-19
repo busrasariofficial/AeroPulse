@@ -1,0 +1,44 @@
+{
+    "project": "AeroPulse",
+    "report_generated_utc": "2026-11-19T23:17:40.758444+00:00",
+    "source_files": [
+        "outputs\\calibration\\calibration_comparison.csv",
+        "outputs\\integrity\\category_drift_audit.csv",
+        "outputs\\integrity\\integrity_audit.csv",
+        "outputs\\integrity\\integrity_summary.json",
+        "outputs\\integrity\\verified_september_metrics.csv",
+        "outputs\\models\\tree_model_comparison.csv",
+        "outputs\\robustness\\airline_robustness.csv",
+        "outputs\\robustness\\daily_robustness.csv",
+        "outputs\\robustness\\departure_period_robustness.csv",
+        "outputs\\robustness\\destination_airport_robustness.csv",
+        "outputs\\robustness\\hourly_robustness.csv",
+        "outputs\\robustness\\origin_airport_robustness.csv",
+        "outputs\\robustness\\risk_band_calibration.csv",
+        "outputs\\threshold_validation\\threshold_comparison.csv"
+    ],
+    "plots_copied": [
+        "outputs\\final_report\\figures\\airline_recall.png",
+        "outputs\\final_report\\figures\\departure_period_f1.png",
+        "outputs\\final_report\\figures\\hourly_miss_rate.png",
+        "outputs\\final_report\\figures\\origin_false_alarm_rate.png",
+        "outputs\\final_report\\figures\\september_risk_calibration.png"
+    ],
+    "warnings": [],
+    "integrity_status": "REVIEW",
+    "integrity_checks": {
+        "PASS": 22,
+        "FAIL": 0,
+        "REVIEW": 3
+    },
+    "september_metrics": {
+        "Flights": 563591,
+        "DelayRate": 0.228105132977638,
+        "ROC_AUC": 0.7141586133491786,
+        "PR_AUC": 0.4248779503811666,
+        "F1": 0.4588469684104103,
+        "Brier": 0.1576911339637595,
+        "LogLoss": 0.4861498510884099,
+        "Threshold": 0.2533308141610321
+    }
+}
