@@ -1,0 +1,11 @@
+Feature,MeanAbsSHAP
+HourSin,0.44840237
+Reporting_Airline,0.28204253
+Origin,0.23193164
+Dest,0.19284727
+DayOfWeek,0.162075
+ScheduledDepHour,0.119553424
+DepPeriod,0.105312355
+LogDistance,0.019967867
+HourCos,0.011879608
+IsWeekend,0.00600083
