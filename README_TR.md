@@ -1,10 +1,9 @@
-
 # AeroPulse ✈️
 ### ABD Uçuş Gecikmesi Tahmini ve Operasyonel Analiz
 
 **Dil:** 🇹🇷 Türkçe | [🇬🇧 English](README.md)
 
-Python, istatistiksel analiz, makine öğrenmesi, açıklanabilir yapay zekâ ve zamansal doğrulama yöntemlerini bir araya getiren uçtan uca bir veri bilimi projesi.
+ABD'deki uçuş gecikmelerini tahmin etmek amacıyla **istatistiksel analiz, makine öğrenmesi, açıklanabilir yapay zekâ, olasılık kalibrasyonu ve zamansal doğrulama** yöntemlerini bir araya getiren uçtan uca veri bilimi projesi.
 
 **Teknolojiler:** Python · Pandas · NumPy · Scikit-learn · XGBoost · SHAP · Matplotlib · Seaborn
 
@@ -12,18 +11,18 @@ Python, istatistiksel analiz, makine öğrenmesi, açıklanabilir yapay zekâ ve
 
 ## Proje Hakkında
 
-Uçuş gecikmeleri; havayolu şirketleri, havalimanları ve yolcular açısından operasyonel sorunlara neden olmaktadır.
+Uçuş gecikmeleri, havayolu şirketleri, havalimanları ve yolcular açısından önemli operasyonel sorunlar oluşturmaktadır.
 
-AeroPulse projesi, ABD'deki uçuşların kalkış gecikmelerini geçmiş uçuş verileri ve planlanan uçuş özellikleri üzerinden tahmin etmeyi amaçlamaktadır.
+AeroPulse, planlanan uçuş bilgileri ve geçmiş uçuş örüntülerinden yararlanarak **15 dakika ve üzerindeki kalkış gecikmelerini** tahmin etmeyi amaçlamaktadır.
 
-Proje yalnızca bir tahmin modeli geliştirmekle sınırlı değildir. Aynı zamanda modelin güvenilirliğini, olasılık kalibrasyonunu, karar eşiklerini ve farklı operasyonel koşullardaki performansını incelemektedir.
+Proje yalnızca bir sınıflandırma modeli geliştirmekle sınırlı değildir. Aynı zamanda tahmin olasılıklarının güvenilirliğini, karar eşiklerini, modelin açıklanabilirliğini ve farklı operasyonel gruplardaki performansını değerlendirmektedir.
 
 ### Araştırma Soruları
 
-- Planlanan uçuş bilgileri kullanılarak 15 dakika ve üzerindeki kalkış gecikmeleri tahmin edilebilir mi?
-- Logistic Regression, Random Forest ve XGBoost modellerinden hangisi daha başarılıdır?
-- Gecikme tahminlerini en fazla hangi değişkenler etkilemektedir?
-- Olasılık kalibrasyonu tahminlerin güvenilirliğini artırabilir mi?
+- Planlanan uçuş bilgileriyle 15 dakika ve üzerindeki gecikmeler tahmin edilebilir mi?
+- Logistic Regression, Random Forest ve XGBoost modelleri nasıl karşılaştırılabilir?
+- Tahminlerde hangi değişkenler öne çıkmaktadır?
+- Olasılık kalibrasyonu tahmin edilen riskleri iyileştirebilir mi?
 - Ağustos verileriyle geliştirilen model Eylül ayında da başarılı olabilir mi?
 - Model performansı havayolu, havalimanı ve kalkış saatine göre nasıl değişmektedir?
 
@@ -31,64 +30,51 @@ Proje yalnızca bir tahmin modeli geliştirmekle sınırlı değildir. Aynı zam
 
 ## Veri Seti
 
-**Kaynak:** ABD Ulaştırma Bakanlığı, Bureau of Transportation Statistics (BTS)
+**Kaynak:** ABD Ulaştırma Bakanlığı — Bureau of Transportation Statistics (BTS)
 
-**Veri seti:** Airline On-Time Performance Data
-
+**Veri seti:** Airline On-Time Performance Data  
 **Dönem:** Ağustos–Eylül 2026
 
-| Veri Seti | Uçuş Sayısı | Kullanım Amacı |
+| Veri Seti | Tamamlanmış Uçuş | Kullanım Amacı |
 |---|---:|---|
 | Ağustos 2026 | 594.207 | Model geliştirme ve iç değerlendirme |
 | Eylül 2026 | 563.591 | Dış dönem doğrulaması |
-| **Toplam** | **1.157.798** | **Analiz edilen tamamlanmış uçuşlar** |
+| **Toplam** | **1.157.798** | **Analiz edilen uçuşlar** |
 
-İptal edilen ve başka havalimanına yönlendirilen uçuşlar modelleme veri setinin dışında bırakılmıştır.
+İptal edilen ve başka havalimanına yönlendirilen uçuşlar modelleme veri setlerinden çıkarılmıştır.
 
 ### Hedef Değişken
 
-`Delayed15`
+`Delayed15` ikili sınıflandırma değişkenidir:
 
-- `0`: Kalkış gecikmesi 15 dakikadan az
-- `1`: Kalkış gecikmesi 15 dakika veya daha fazla
+- `0` — Kalkış gecikmesi 15 dakikadan az
+- `1` — Kalkış gecikmesi 15 dakika veya daha fazla
 
-### Kullanılan Değişkenler
+### Tahmin Değişkenleri
 
 **Zamansal değişkenler**
-- Haftanın günü
-- Hafta sonu göstergesi
-- Planlanan kalkış saati
-- Kalkış zaman dilimi
+- Haftanın günü ve hafta sonu göstergesi
+- Planlanan kalkış saati ve kalkış zaman dilimi
 - Döngüsel saat dönüşümleri (`HourSin`, `HourCos`)
 
 **Uçuş özellikleri**
 - Havayolu şirketi
-- Kalkış havalimanı
-- Varış havalimanı
+- Kalkış ve varış havalimanları
 - Logaritmik dönüşüm uygulanmış uçuş mesafesi
 
-Tahmin değişkenleri arasında gerçekleşmiş kalkış veya varış gecikmesi kullanılmamıştır.
+Gerçekleşmiş kalkış ve varış gecikmeleri tahmin değişkeni olarak kullanılmamıştır. Böylece doğrudan hedef değişken sızıntısından kaçınılmıştır.
 
 ---
 
 ## Metodoloji
 
-### 1. Veri Hazırlama
+### 1. Veri Hazırlama ve Keşifsel Analiz
 
-- Ham BTS verilerinin incelenmesi
-- Veri temizleme
-- Eksik değer analizleri
-- Uçuş durumlarının değerlendirilmesi
-- Özellik mühendisliği
+Ham BTS verileri incelenmiş; veri temizleme, eksik değer analizi, uçuş durumu kontrolleri, gecikme dağılımları ve havayolu-havalimanı bazlı analizler gerçekleştirilmiştir.
 
-### 2. Keşifsel ve İstatistiksel Analiz
+### 2. Özellik Mühendisliği
 
-- Gecikme dağılımları
-- Havayolu bazında gecikme oranları
-- Havalimanı istatistikleri
-- Saatlik gecikme örüntüleri
-- Uçuş mesafesi analizleri
-- İstatistiksel karşılaştırmalar
+Planlanan uçuş bilgileri modellemeye uygun hâle getirilmiş, kategorik değişkenler ve döngüsel kalkış saati özellikleri oluşturulmuştur.
 
 ### 3. Makine Öğrenmesi
 
@@ -98,118 +84,92 @@ Tahmin değişkenleri arasında gerçekleşmiş kalkış veya varış gecikmesi 
 - Random Forest
 - XGBoost
 
-Sonraki kalibrasyon ve dış dönem doğrulama aşamalarında XGBoost kullanılmıştır.
+Nihai kalibrasyon ve dış dönem doğrulama aşamalarında **XGBoost** tercih edilmiştir.
 
 ### 4. Açıklanabilir Yapay Zekâ
 
-Modelin tahmin davranışını anlamak amacıyla:
-
-- Özellik önem analizi
-- SHAP analizi
-- Ablation Study (değişken grubu çıkarma analizi)
-
-uygulanmıştır.
+Modelin tahmin davranışını incelemek amacıyla özellik önem analizi, SHAP ve ablation study (değişken grubu çıkarma analizi) uygulanmıştır.
 
 ### 5. Olasılık Kalibrasyonu
 
-Üç yaklaşım karşılaştırılmıştır:
+Orijinal XGBoost olasılıkları, sigmoid ve isotonic kalibrasyon yöntemleriyle karşılaştırılmıştır.
 
-- Orijinal XGBoost olasılıkları
-- Sigmoid kalibrasyonu
-- Isotonic kalibrasyonu
-
-Son değerlendirme sürecinde sigmoid kalibrasyonu tercih edilmiştir.
+Nihai değerlendirme için **sigmoid kalibrasyonu** seçilmiştir.
 
 ### 6. Karar Eşiği Optimizasyonu
 
-Ağustos doğrulama verisi üzerinden bir sınıflandırma eşiği seçilmiştir.
+Sınıflandırma eşiği Ağustos doğrulama verileri üzerinden belirlenmiştir.
 
 **Nihai karar eşiği: `0.253331`**
 
-Bu eşik Eylül verilerine yeniden optimize edilmeden uygulanmıştır.
+Bu eşik, Eylül sonuçları kullanılarak yeniden optimize edilmeden uygulanmıştır.
 
-### 7. Dış Dönem Doğrulaması
+### 7. Dış Dönem Doğrulaması ve Sağlamlık Analizi
 
-Ağustos 2026 verileriyle geliştirilen model, Eylül 2026 verileri üzerinde test edilmiştir.
+Ağustos ayında geliştirilen model, Eylül 2026 uçuşları üzerinde değerlendirilmiştir.
 
-Böylece yalnızca rastgele bir eğitim-test ayrımına bağlı kalmadan zamansal genelleme performansı değerlendirilmiştir.
-
-### 8. Sağlamlık ve Hata Analizi
-
-Model performansı şu kırılımlarda incelenmiştir:
-
-- Havayolu şirketleri
-- Kalkış zaman dilimleri
-- Planlanan kalkış saatleri
-- Kalkış havalimanları
-- Varış havalimanları
-- Uçuş tarihleri
-- Tahmin edilen risk aralıkları
+Ayrıca havayolu, havalimanı, kalkış zaman dilimi, saat, tarih ve tahmin edilen risk gruplarına göre alt grup analizleri yapılmıştır.
 
 ---
 
 ## Zamansal Veri Ayrımı
 
-| Veri Bölümü | Tarih | Amaç |
+| Veri Bölümü | Dönem | Amaç |
 |---|---|---|
 | Eğitim | 1–20 Ağustos 2026 | Model eğitimi |
 | Doğrulama | 21–25 Ağustos 2026 | Kalibrasyon ve eşik seçimi |
 | İç test | 26–31 Ağustos 2026 | İç performans değerlendirmesi |
 | Dış doğrulama | 1–30 Eylül 2026 | Zamansal genelleme testi |
 
-Ağustos doğrulama verisi hem kalibrasyon hem de eşik optimizasyonunda kullanılmıştır. Bu nedenle doğrulama performansı tamamen bağımsız bir değerlendirme değildir.
-
-Eylül verileri dış dönem değerlendirmesi olarak kullanılmıştır.
+**Metodolojik not:** Ağustos doğrulama verisi hem kalibrasyon hem de karar eşiği seçiminde kullanılmıştır. Bağımsız dış dönem değerlendirmesi Eylül verileriyle gerçekleştirilmiştir.
 
 ---
 
 ## Nihai Model Performansı
 
-### Eylül 2026 — Dış Dönem Testi
+### Eylül 2026 — Dış Dönem Doğrulaması
 
-Model **563.591 tamamlanmış uçuş** üzerinde değerlendirilmiştir.
+Kalibre edilmiş XGBoost modeli **563.591 tamamlanmış uçuş** üzerinde değerlendirilmiştir.
 
 | Performans Metriği | Sonuç |
 |---|---:|
-| ROC-AUC | **0,7142** |
-| PR-AUC | **0,4249** |
-| F1-Score | **0,4588** |
+| **ROC-AUC** | **0,7142** |
+| **PR-AUC** | **0,4249** |
+| **F1-Score** | **0,4588** |
 | Precision (Kesinlik) | 0,3988 |
 | Recall (Duyarlılık) | 0,5401 |
 | Accuracy (Doğruluk) | 0,7094 |
-| Brier Score | **0,1577** |
+| **Brier Score** | **0,1577** |
 | Log Loss | 0,4861 |
 | Karar Eşiği | 0,253331 |
 
-Eylül ayında gerçekleşen kalkış gecikmesi oranı **%22,81** olarak hesaplanmıştır.
+**Eylül ayında gözlenen gecikme oranı:** %22,81
 
 ### Karmaşıklık Matrisi (Confusion Matrix)
 
-| | Zamanında Tahmin | Gecikmeli Tahmin |
+| Gerçek / Tahmin | Zamanında | Gecikmeli |
 |---|---:|---:|
-| Gerçekte Zamanında | 330.366 | 104.667 |
-| Gerçekte Gecikmeli | 59.120 | 69.438 |
+| Zamanında | 330.366 | 104.667 |
+| Gecikmeli | 59.120 | 69.438 |
 
-Seçilen karar eşiğiyle model, geciken uçuşların yaklaşık **%54'ünü** tespit etmiştir.
+Model, seçilen eşikte geciken uçuşların yaklaşık **%54'ünü** tespit etmiştir.
 
-Bununla birlikte yanlış gecikme uyarılarının sayısı da yüksektir.
-
-Bu durum, gecikmeleri yakalama oranı ile yanlış alarm oranı arasındaki dengeyi göstermektedir.
+Bununla birlikte yanlış gecikme uyarılarının sayısı da yüksektir. Bu sonuç, gecikmeleri yakalama başarısı ile yanlış alarm oranı arasındaki dengeyi göstermektedir.
 
 ---
 
 ## Önemli Bulgular
 
-### 1. Kalkış Saati Önemli Bir Tahmin Değişkenidir
+### 1. Kalkış Saati Güçlü Bir Tahmin Değişkenidir
 
-XGBoost özellik önem analizinde zamansal değişkenler öne çıkmıştır.
+XGBoost gain tabanlı özellik önem analizinde zamansal değişkenler öne çıkmıştır:
 
-- `HourSin`: yaklaşık %45,24
-- `DepPeriod`: yaklaşık %27,61
+- `HourSin`: yaklaşık **%45,24**
+- `DepPeriod`: yaklaşık **%27,61**
 
-Bu değerler modelin değişkenleri nasıl kullandığını göstermektedir; doğrudan nedensel etki olarak yorumlanmamalıdır.
+Bu değerler model içindeki önem düzeylerini göstermektedir; nedensel etki olarak yorumlanmamalıdır.
 
-### 2. Gecikmeler Kalkış Zamanına Göre Değişmektedir
+### 2. Gecikme Riski Gün İçinde Değişmektedir
 
 | Kalkış Dönemi | Gerçek Gecikme Oranı | Model Recall |
 |---|---:|---:|
@@ -218,11 +178,13 @@ Bu değerler modelin değişkenleri nasıl kullandığını göstermektedir; do�
 | Akşam | %34,62 | %80,48 |
 | Gece | %22,23 | %57,12 |
 
-Akşam uçuşlarında gecikme oranı en yüksek seviyededir.
+En yüksek gözlenen gecikme oranı akşam uçuşlarında gerçekleşmiştir.
 
-Model, seçilen karar eşiğinde akşam gecikmelerini sabah gecikmelerine kıyasla daha yüksek oranda yakalamaktadır.
+Model, seçilen eşikte akşam uçuşlarındaki gecikmeleri sabah uçuşlarına göre çok daha yüksek oranda yakalamaktadır.
 
-### 3. Havayolları Arasında Performans Farkları Vardır
+### 3. Havayolları Arasında Performans Farkları Bulunmaktadır
+
+Seçilmiş Eylül sonuçları:
 
 | Havayolu | Gecikme Oranı | Recall |
 |---|---:|---:|
@@ -232,21 +194,21 @@ Model, seçilen karar eşiğinde akşam gecikmelerini sabah gecikmelerine kıyas
 | United (UA) | %20,04 | %46,66 |
 | JetBlue (B6) | %25,80 | %76,43 |
 
-Bu sonuçlar modelin yalnızca genel metriklerle değil, alt gruplar bazında da değerlendirilmesi gerektiğini göstermektedir.
+Bu farklılıklar, modelin yalnızca genel performans metrikleriyle değil, alt gruplar bazında da değerlendirilmesi gerektiğini göstermektedir.
 
-### 4. Kalibrasyon Analizi
+### 4. Olasılık Kalibrasyonu
 
-Kalibre edilmiş modelin Eylül Brier Score değeri **0,1577** olarak hesaplanmıştır.
+Nihai modelin Eylül Brier Score değeri **0,1577** olarak hesaplanmıştır.
 
-Risk aralığı analizlerinde modelin bazı gruplarda gerçekleşen gecikme oranından biraz daha düşük olasılık tahmin ettiği gözlemlenmiştir.
+Risk grubu analizlerinde bazı grupların tahmin edilen olasılıklarının gerçekleşen gecikme oranlarından düşük kaldığı gözlemlenmiştir.
 
-Bu nedenle kalibrasyonun başarılı olması, bütün alt gruplarda kusursuz olasılık tahmini yapıldığı anlamına gelmemektedir.
+Bu nedenle genel kalibrasyon performansı, bütün alt gruplarda kusursuz tahmin yapıldığı anlamına gelmemektedir.
 
 ### 5. Zamansal Doğrulamanın Önemi
 
-Modelin Ağustos ayında geliştirilip Eylül ayında değerlendirilmesi, kısa dönemli zamansal genelleme açısından ek kanıt sağlamaktadır.
+Modelin Ağustos ayında geliştirilip Eylül ayında değerlendirilmesi, kısa dönemli zamansal genelleme açısından ek kanıt sunmaktadır.
 
-Bununla birlikte farklı mevsimler ve yıllar üzerindeki performansı henüz test edilmemiştir.
+Farklı mevsimler ve yıllardaki performans ise henüz değerlendirilmemiştir.
 
 ---
 
@@ -254,98 +216,99 @@ Bununla birlikte farklı mevsimler ve yıllar üzerindeki performansı henüz te
 
 ### Kalkış Dönemine Göre Model Performansı
 
-![Kalkış Dönemi F1](outputs/robustness/departure_period_f1.png)
+![Kalkış Dönemi F1](robustness/departure_period_f1.png)
 
 ### Havayolu Bazında Recall
 
-![Havayolu Recall](outputs/robustness/airline_recall.png)
+![Havayolu Recall](robustness/airline_recall.png)
 
 ### Saatlik Kaçırılan Gecikmeler
 
-![Saatlik Miss Rate](outputs/robustness/hourly_miss_rate.png)
+![Saatlik Miss Rate](robustness/hourly_miss_rate.png)
 
 ### Havalimanı Bazında Yanlış Alarm Analizi
 
-![Havalimanı False Alarm](outputs/robustness/origin_false_alarm_rate.png)
+![Havalimanı False Alarm](robustness/origin_false_alarm_rate.png)
 
-### Olasılık Kalibrasyonu
+### Eylül Olasılık Kalibrasyonu
 
-![Eylül Risk Kalibrasyonu](outputs/robustness/september_risk_calibration.png)
+![Eylül Risk Kalibrasyonu](final_report/figures/september_risk_calibration.png)
 
 ---
 
 ## Model Bütünlüğü ve Tekrarlanabilirlik
 
-Model bütünlüğünü değerlendirmek amacıyla ayrı bir teknik denetim gerçekleştirilmiştir.
+Modelin güvenilirliğini değerlendirmek amacıyla ayrı bir bütünlük denetimi gerçekleştirilmiştir.
 
-Denetim kapsamında:
+Denetimde veri şeması, eksik değerler, zamansal ayrım, özellik mühendisliği, kategori değişimleri, tahminlerin yeniden üretilebilirliği ve karar eşiği tutarlılığı incelenmiştir.
 
-- Dosya ve model özelliklerinin tutarlılığı
-- Eksik değer kontrolleri
-- Zamansal veri ayrımı
-- Özellik mühendisliği doğrulaması
-- Kategori değişimleri
-- Tahminlerin yeniden üretilebilirliği
-- Karar eşiği tutarlılığı
-- Dosya bütünlüğü
-
-incelenmiştir.
-
-### Denetim Sonuçları
-
-| Durum | Kontrol Sayısı |
+| Denetim Durumu | Kontrol Sayısı |
 |---|---:|
-| PASS | 22 |
+| **PASS** | **22** |
 | FAIL | 0 |
 | REVIEW | 3 |
 
-Eylül tahminleri yeniden üretildiğinde kaydedilmiş tahminlerle maksimum fark **0,0000000000** olarak bulunmuştur.
+Eylül tahminleri yeniden üretildiğinde kaydedilmiş olasılıklarla maksimum mutlak fark **0,0000000000** olarak raporlanmıştır.
 
-Orijinal model eğitimi ve kalibrasyon kodları da ayrıca incelenmiştir.
-
-Otomatik denetimdeki üç inceleme kaydı, şeffaflık amacıyla korunmuştur.
+Üç inceleme kaydı, metodolojik şeffaflık amacıyla korunmuştur.
 
 ---
 
-## Proje Klasör Yapısı
+## GitHub Proje Yapısı
 
 ```text
 AeroPulse/
-├── src/
-│   ├── 01_initial_eda.py
-│   ├── 02_data_cleaning.py
-│   ├── 03_exploratory_analysis.py
-│   ├── ...
-│   ├── 15_model_robustness.py
-│   ├── 16_model_integrity.py
-│   └── 17_final_report.py
-├── data/
-│   └── processed/
+├── 01_initial_eda.py
+├── 02_data_cleaning.py
+├── 03_exploratory_analysis.py
+├── 04_statistical_analysis.py
+├── 04b_missingness_diagnostics.py
+├── 05_feature_engineering.py
+├── 06_logistic_regression.py
+├── 06b_threshold_optimization.py
+├── 07_tree_models.py
+├── 08_feature_importance.py
+├── 08b_shap_analysis.py
+├── 09_ablation_study.py
+├── 10_model_calibration.py
+├── 10b_probability_calibration.py
+├── 11_september_validation.py
+├── 12_september_preprocessing.py
+├── 13_external_validation.py
+├── 14_threshold_validation.py
+├── 15_model_robustness.py
+├── 16_model_integrity.py
+├── 17_final_report.py
 ├── outputs/
 │   ├── calibration/
+│   ├── experiments/
 │   ├── explainability/
-│   ├── external_validation/
-│   ├── figures/
-│   ├── final_report/
-│   ├── integrity/
-│   ├── models/
-│   ├── robustness/
-│   ├── statistics/
-│   ├── tables/
-│   └── threshold_validation/
+│   └── external_validation/
+├── robustness/
+│   ├── airline_recall.png
+│   ├── departure_period_f1.png
+│   ├── hourly_miss_rate.png
+│   └── origin_false_alarm_rate.png
+├── final_report/
+│   ├── AeroPulse_Final_Report.md
+│   ├── AeroPulse_Executive_Summary.md
+│   ├── final_metrics.csv
+│   ├── final_report_manifest.json
+│   └── figures/
+│       └── september_risk_calibration.png
 ├── README.md
 ├── README_TR.md
 ├── requirements.txt
 └── .gitignore
 ```
 
-Büyük veri setleri ve kaydedilmiş model dosyaları GitHub deposuna dahil edilmemektedir.
+Depoda Python analiz kodları ve seçilmiş çıktı dosyaları bulunmaktadır. Ham BTS verileri ve büyük ara dosyalar GitHub'a eklenmemiştir.
 
 ---
 
 ## Kurulum
 
-Projeyi bilgisayarına klonla:
+Projeyi klonla:
 
 ```bash
 git clone https://github.com/busrasariofficial/AeroPulse.git
@@ -358,7 +321,7 @@ Sanal ortam oluştur:
 python -m venv venv
 ```
 
-Windows üzerinde sanal ortamı etkinleştir:
+Windows üzerinde etkinleştir:
 
 ```bash
 venv\Scripts\activate
@@ -370,53 +333,48 @@ Bağımlılıkları yükle:
 pip install -r requirements.txt
 ```
 
-Orijinal BTS veri setlerinin ayrıca indirilmesi ve uygun veri klasörlerine yerleştirilmesi gerekmektedir.
+**Veri gereksinimi:** Orijinal BTS veri setleri ayrıca indirilmeli ve beklenen yerel veri klasörlerine yerleştirilmelidir.
 
-Analizlerin yeniden çalıştırılabilmesi için ara dosyaların da doğru sırayla üretilmesi gerekir.
+Analizleri yeniden çalıştırmak için numaralandırılmış Python dosyaları uygun sırayla yürütülmeli ve sonraki aşamalarda kullanılan ara çıktılar oluşturulmalıdır.
 
 ---
 
 ## Projenin Sınırlamaları
 
 - Çalışma yalnızca iki ardışık ayı kapsamaktadır.
-- Kalibrasyon ve eşik seçimi aynı doğrulama dönemini kullanmaktadır.
-- Sınıf dengesizliği performans metriklerini etkilemektedir.
-- Havayolu ve havalimanı bazında performans farklılıkları bulunmaktadır.
+- Kalibrasyon ve eşik optimizasyonu aynı Ağustos doğrulama dönemini kullanmaktadır.
+- Sınıf dengesizliği precision, recall ve eşik seçimini etkilemektedir.
+- Havayolu, havalimanı ve kalkış dönemleri arasında performans farklılıkları vardır.
 - Bazı Eylül havalimanı kategorileri Ağustos referans verisinde bulunmamaktadır.
-- Gerçek zamanlı hava durumu ve hava trafik yoğunluğu verileri kullanılmamıştır.
-- Model üretim ortamına hazır bir sistem değil, araştırma ve portföy prototipidir.
-- Bulgular nedensellik kanıtı olarak yorumlanmamalıdır.
+- Gerçek zamanlı hava durumu ve hava trafik yoğunluğu kullanılmamıştır.
+- Model, üretim ortamına hazır bir sistem değil, araştırma ve portföy prototipidir.
+- Tahminsel ilişkiler nedensellik kanıtı değildir.
 
 ---
 
 ## Gelecekte Yapılabilecek Geliştirmeler
 
-- Çok aylı ve çok yıllı zamansal doğrulama
-- Hava durumu ve havalimanı yoğunluğu değişkenlerinin eklenmesi
-- Alt gruplar için daha ayrıntılı kalibrasyon
-- Model izleme ve veri kayması tespiti
+- Çok yıllı ve mevsimsel zamansal doğrulama
+- Hava durumu ve havalimanı yoğunluğu verilerinin eklenmesi
+- Alt gruplar için ayrıntılı olasılık kalibrasyonu
+- Veri kayması ve model performansı izleme
 - Tahmin servisinin geliştirilmesi
-
-Bu geliştirmeler mevcut projenin kapsamı dışındadır.
 
 ---
 
 ## Teknik Raporlar
 
-- [İngilizce Final Teknik Rapor](outputs/final_report/AeroPulse_Final_Report.md)
-- [Yönetici Özeti](outputs/final_report/AeroPulse_Executive_Summary.md)
-- [Doğrulanmış Eylül Metrikleri](outputs/final_report/final_metrics.csv)
+- [İngilizce Final Teknik Rapor](final_report/AeroPulse_Final_Report.md)
+- [Yönetici Özeti](final_report/AeroPulse_Executive_Summary.md)
+- [Doğrulanmış Eylül Metrikleri](final_report/final_metrics.csv)
 
 ---
 
 ## Geliştirici
 
-**Büşra Sarı**
-
+**Büşra Sarı**  
 İstatistik Mezunu | Veri Analitiği ve Makine Öğrenmesi
 
 [GitHub Profilim](https://github.com/busrasariofficial)
-
----
 
 *Bağımsız bir veri bilimi portföy projesi olarak geliştirilmiştir.*
