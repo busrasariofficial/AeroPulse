@@ -1,0 +1,30 @@
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+
+# Raw and processed datasets
+data/raw/
+data/processed/*.csv
+
+# Trained models
+*.joblib
+*.pkl
+
+# Large prediction-level outputs
+outputs/threshold_validation/*predictions.csv
+outputs/external_validation/*predictions.csv
+outputs/robustness/september_error_analysis.csv
+
+# Temporary files
+.DS_Store
+Thumbs.db
+*.log
+
